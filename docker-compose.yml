@@ -4,6 +4,31 @@
 services:
   # This service will extend code from dcape
   app:
+    hostname: ${APP_TAG}
     environment:
-      # Some var to keep YML struct
-      - DEBUG=yes
+      - INFLUXDB_DB=${DB_NAME}
+      - INFLUXDB_ADMIN_USER=${USER_NAME}
+      - INFLUXDB_ADMIN_PASSWORD=${USER_PASS}
+    volumes:
+      - ${APP_ROOT}/db/influxdb:/var/lib/influxdb
+
+  grafana:
+    image: ${GF_IMAGE}:${GF_IMAGE_VER}
+    restart: always
+    depends_on:
+      - app
+    environment:
+      - GF_SECURITY_ADMIN_USER=${USER_NAME}
+      - GF_SECURITY_ADMIN_PASSWORD=${USER_PASS}
+      - GF_INSTALL_PLUGINS
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/ssl/certs:/etc/ssl/certs:ro
+      - ${APP_ROOT}/db/grafana:/var/lib/grafana
+    labels:
+      - traefik.enable=true
+      - dcape.traefik.tag=${DCAPE_TAG}
+      - traefik.http.routers.${GF_APP_TAG}.rule=Host(`${GF_APP_SITE:?Must be set}`)
+      - traefik.http.routers.${GF_APP_TAG}.tls=${USE_TLS}
+      - traefik.http.routers.${GF_APP_TAG}.tls.certresolver=default

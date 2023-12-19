@@ -7,19 +7,39 @@ CFG                ?= .env
 CFG_BAK            ?= $(CFG).bak
 
 #- App name
-APP_NAME           ?= service-template
+APP_NAME           ?= ifdb
 
 #- Docker image name
-IMAGE              ?= ghcr.io/lekovr/service-template
+IMAGE              ?= influxdb
 
 #- Docker image tag
-IMAGE_VER          ?= 0.1.0
+IMAGE_VER          ?= 1.8.10
 
-# If you need database, uncomment this var
-#USE_DB              = yes
+#- InfluxDB database name
+DB_NAME            ?= influx
+
+#- Grafana host name
+GF_APP_SITE        ?= gf.dev.test
+#- Grafana container id
+GF_APP_TAG         ?= gf-dev-test
+
+#- Grafana docker image name
+GF_IMAGE           ?= grafana/grafana
+
+#- Grafana docker image tag
+GF_IMAGE_VER       ?= 10.2.3
+
+#- Grafana plugins
+GF_INSTALL_PLUGINS ?=
+
+#- app root
+APP_ROOT           ?= $(PWD)
 
 # If you need user name and password, uncomment this var
-#ADD_USER            = yes
+ADD_USER            = yes
+
+# Keep persistent dir on deploy
+APP_ROOT_OPTS       = keep
 
 # ------------------------------------------------------------------------------
 
@@ -56,5 +76,8 @@ use-template:
 
 .default-deploy: prep
 
-prep:
+prep: grafana
 	@echo "Just to show we able to attach"
+
+db/grafana:
+	@mkdir $@ && chmod 777 $@
