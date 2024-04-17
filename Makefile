@@ -80,4 +80,4 @@ prep: grafana
 	@echo "Just to show we able to attach"
 
 db/grafana:
-	@mkdir $@ && chmod 777 $@
+	@mkdir -p $@ && chmod 777 $@
